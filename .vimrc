@@ -10,10 +10,17 @@ nnoremap <C-K> <C-W><C-K>
 nnoremap <C-L> <C-W><C-L>
 nnoremap <C-H> <C-W><C-H>
 
+syntax on
+
 " Enable folding
 set foldmethod=indent
 set foldlevel=99
 set backspace=indent,eol,start
+set nu
+set noswapfile 
+set hlsearch
+set incsearch
+set spell spelllang=en_us
 
 " Enable folding with the spacebar
 nnoremap <space> za
@@ -22,14 +29,14 @@ nnoremap <space> za
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 
-au BufNewFile,BufRead *.py
-    \ set tabstop=4 |
-    \ set softtabstop=4 |
-    \ set shiftwidth=4 |
-    \ set textwidth=79 |
-    \ set expandtab |
-    \ set autoindent |
-    \ set fileformat=unix
+" au BufNewFile,BufRead *.py
+"   \ set tabstop=4 |
+"   \ set softtabstop=4 |
+"   \ set shiftwidth=4 |
+"   \ set textwidth=79 |
+"   \ set expandtab |
+"   \ set autoindent |
+"   \ set fileformat=unix
 
 " alternatively, pass a path where Vundle should install plugins
 "call vundle#begin('~/some/path/here')
@@ -39,8 +46,6 @@ Plugin 'gmarik/Vundle.vim'
 Bundle 'Valloric/YouCompleteMe'
 
 let python_highlight_all=1
-syntax on
-set nu
 
 let g:ycm_autoclose_preview_window_after_completion=1
 map <leader>g  :YcmCompleter GoToDefinitionElseDeclaration<CR>

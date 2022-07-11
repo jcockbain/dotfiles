@@ -1,16 +1,17 @@
 # If you come from bash you might have to change your $PATH.
-# export PATH=/opt/homebrew/bin:$HOME/bin:/usr/local/bin:$PATH
+# export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH="/Users/jamescockbain/.oh-my-zsh"
-
-export PATH=/opt/homebrew/bin:/Users/jamescockbain/go/bin:$PATH
+export ZSH="$HOME/.oh-my-zsh"
+export MYVIMRC="~/.config/nvim/init.vim"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="robbyrussell"
+ZSH_THEME="eastwood"
+
+# source ~/git/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -25,14 +26,13 @@ ZSH_THEME="robbyrussell"
 # Case-sensitive completion must be off. _ and - will be interchangeable.
 # HYPHEN_INSENSITIVE="true"
 
-# Uncomment the following line to disable bi-weekly auto-update checks.
-# DISABLE_AUTO_UPDATE="true"
-
-# Uncomment the following line to automatically update without prompting.
-# DISABLE_UPDATE_PROMPT="true"
+# Uncomment one of the following lines to change the auto-update behavior
+# zstyle ':omz:update' mode disabled  # disable automatic updates
+# zstyle ':omz:update' mode auto      # update automatically without asking
+# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
 
 # Uncomment the following line to change how often to auto-update (in days).
-# export UPDATE_ZSH_DAYS=13
+# zstyle ':omz:update' frequency 13
 
 # Uncomment the following line if pasting URLs and other text is messed up.
 # DISABLE_MAGIC_FUNCTIONS="true"
@@ -47,12 +47,15 @@ ZSH_THEME="robbyrussell"
 # ENABLE_CORRECTION="true"
 
 # Uncomment the following line to display red dots whilst waiting for completion.
+# You can also set it to another string to have that shown instead of the default red dots.
+# e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
+# Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
 # COMPLETION_WAITING_DOTS="true"
 
 # Uncomment the following line if you want to disable marking untracked files
 # under VCS as dirty. This makes repository status check for large repositories
 # much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
+DISABLE_UNTRACKED_FILES_DIRTY="true"
 
 # Uncomment the following line if you want to change the command execution time
 # stamp shown in the history command output.
@@ -70,15 +73,26 @@ ZSH_THEME="robbyrussell"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git)
+plugins=(
+  git 
+  docker
+  zsh-autosuggestions
+  vi-mode
+)
+
+VI_MODE_SET_CURSOR=true
 
 source $ZSH/oh-my-zsh.sh
+
+# When directory changed, run ls -a afterwards.
+function chpwd() {
+    emulate -L zsh
+    ls -a
+}
 
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
-
-export PYTHONPATH="python:$PYTHONPATH"
 
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
@@ -89,8 +103,6 @@ export PYTHONPATH="python:$PYTHONPATH"
 # else
 #   export EDITOR='mvim'
 # fi
-
-export AOC_COOKIE=53616c7465645f5fc442be68ec6f1fc4b44b8b77b9084fc9b49a44e232e0aca50b67003c9010841a48b869a70f7f672f
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
@@ -104,25 +116,24 @@ export AOC_COOKIE=53616c7465645f5fc442be68ec6f1fc4b44b8b77b9084fc9b49a44e232e0ac
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias k="kubectl"
-alias gst="git status"
-alias gb="git branch"
-alias gcmsg="git commit -m"
-alias gco="git checkout"
+alias vim=nvim 
 
-export PATH="/usr/local/opt/yq@3/bin:Users/jamescockbain/bin:$PATH"
+source <(kubectl completion zsh)
+source <(plz --completion_script)
 
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/usr/local/Caskroom/miniforge/base/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/usr/local/Caskroom/miniforge/base/etc/profile.d/conda.sh" ]; then
-        . "/usr/local/Caskroom/miniforge/base/etc/profile.d/conda.sh"
-    else
-        export PATH="/usr/local/Caskroom/miniforge/base/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<
+export KUBECONFIG="$HOME/.kube/config"
+for f in $HOME/.kube/configs/*.yaml; do
+    export KUBECONFIG=$KUBECONFIG:$f
+done
+
+autoload -U colors; colors
+source ~/git/zsh-kubectl-prompt/kubectl.zsh
+RPROMPT='%{$fg[blue]%}($ZSH_KUBECTL_PROMPT)%{$reset_color%}'
+
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=5'
+
+alias kcd='kubectl config set-context $(kubectl config current-context) --namespace'
+alias kuc='kubectl config use-context'
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
